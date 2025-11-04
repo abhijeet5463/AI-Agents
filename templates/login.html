@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BodhiPilot</title>
+    <style>
+        body {
+            margin: 0; font-family: Arial, sans-serif; background-color: #343541; display: flex; justify-content: center; align-items: center; height: 100vh;
+        }
+        #login-container {
+            background-color: #444654; color: #ececec; padding: 30px; border-radius: 12px; text-align: center; width: 320px;
+        }
+        input {
+            width: 90%; padding: 10px; margin: 10px 0; border-radius: 6px; border: none; background-color: #40414f; color: white;
+        }
+        button {
+            width: 100%; padding: 10px 16px; background-color: #10a37f; border: none; color: white; border-radius: 6px; cursor: pointer;
+        }
+        button:hover { background-color: #0e8f6e; }
+        #message { margin-top: 10px; color: #ff6b6b; }
+        a { color: #10a37f; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div id="login-container">
+        <h2>BodhiPilot Login</h2>
+        <form id="login-form">
+            <input type="text" id="username" placeholder="Username" required />
+            <input type="password" id="password" placeholder="Password" required />
+            <button type="submit">Login</button>
+        </form>
+        <p><a href="/register">Don't have an account? Register</a></p>
+        <p id="message"></p>
+    </div>
+    <script>
+        const form = document.getElementById('login-form');
+        const message = document.getElementById('message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const params = new URLSearchParams();
+            params.append('username', username);
+            params.append('password', password);
+
+            const response = await fetch('/token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params
+            });
+
+            const data = await response.json();
+            if (data.access_token) {
+                localStorage.setItem('token', data.access_token);
+                localStorage.setItem('username', username);
+                window.location.href = '/';
+            } else {
+                message.textContent = data.detail || 'Login failed. Check credentials.';
+            }
+        });
+    </script>
+</body>
+</html>
